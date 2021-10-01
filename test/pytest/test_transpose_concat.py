@@ -7,7 +7,7 @@ import yaml
 
 @pytest.fixture(scope='module')
 def data():
-    X = np.random.rand(1, 2, 3)
+    X = np.random.rand(100, 2, 3)
     return X
 
 @pytest.fixture(scope='module')
