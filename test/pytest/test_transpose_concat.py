@@ -1,11 +1,8 @@
-from hls4ml.converters.keras_to_hls import keras_to_hls
 import pytest
 import hls4ml
 import numpy as np
-from sklearn.metrics import accuracy_score
-import tensorflow as tf
 from tensorflow.keras.models import model_from_json, Model
-from tensorflow.keras.layers import Input, Permute
+from tensorflow.keras.layers import Input, Permute, Concatenate
 import yaml
 
 @pytest.fixture(scope='module')
@@ -16,7 +13,9 @@ def data():
 @pytest.fixture(scope='module')
 def keras_model():
     inp = Input(shape=(2, 3), name='input_1')
-    out = Permute((2, 1))(inp)
+    x = Permute((2, 1))(inp)
+    y = Concatenate(axis=1)([x, x])
+    out = Concatenate(axis=1)([x, y])
     model = Model(inputs=inp, outputs=out)
     return model
 
