@@ -2,7 +2,7 @@ import pytest
 import hls4ml
 import numpy as np
 from tensorflow.keras.models import model_from_json, Model
-from tensorflow.keras.layers import Input, Permute, Concatenate
+from tensorflow.keras.layers import Input, Permute, Concatenate, Activation
 import yaml
 
 @pytest.fixture(scope='module')
@@ -15,6 +15,7 @@ def keras_model():
     inp = Input(shape=(2, 3), name='input_1')
     x = Permute((2, 1))(inp)
     y = Concatenate(axis=1)([x, x])
+    x = Activation('relu', name='relu')(x)
     out = Concatenate(axis=1)([x, y])
     model = Model(inputs=inp, outputs=out)
     return model
@@ -26,6 +27,7 @@ def hls_model(keras_model, io_type):
     hls_config = hls4ml.utils.config_from_keras_model(keras_model, 
                                                       default_precision='ap_fixed<16,3,AP_RND_CONV,AP_SAT>',
                                                       granularity='name')
+    hls_config['LayerName']['relu']['Precision'] = 'ap_ufixed<17,3>'
     hls_model = hls4ml.converters.convert_from_keras_model(keras_model,
                                                            hls_config=hls_config,
                                                            io_type=io_type,
